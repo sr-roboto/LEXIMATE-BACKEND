@@ -3,11 +3,11 @@ import { AppDataSource } from '@database/db';
 import { User, People, Role } from '@user/entities';
 import { CreateUserDto, UpdateUserDto } from '@user/dtos';
 
+console.log('UserService');
 export class UserService {
   private readonly userRepository = AppDataSource.getRepository(User);
   private readonly peopleRepository = AppDataSource.getRepository(People);
   private readonly roleRepository = AppDataSource.getRepository(Role);
-
   async findByEmail(email: string) {
     return this.userRepository.findOne({
       where: { email },
