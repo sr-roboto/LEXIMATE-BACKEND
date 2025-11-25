@@ -19,7 +19,7 @@
     "prod": "docker compose up --build",
     "prod:down": "docker compose down",
     "prod:logs": "docker compose logs -f",
-    "prod:rebuild": "docker compose down && docker compose build --no-cache && docker compose up -d",
+    "prod:rebuild": "docker compose down -v && docker compose build --no-cache && docker compose up -d",
     "docker:logs": "docker compose logs -f",
     "docker:logs:backend": "docker compose logs -f backend",
     "docker:logs:postgres": "docker compose logs -f postgres",
