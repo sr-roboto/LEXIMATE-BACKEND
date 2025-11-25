@@ -51,6 +51,26 @@ services:
     networks:
       - leximate-network
 
+  mobile:
+    build: ../LEXIMATE-MOBILE
+    container_name: leximate-mobile
+    restart: no
+    ports:
+      - "8081:8081"
+      - "19000:19000"
+      - "19001:19001"
+      - "19002:19002"
+    environment:
+      - REACT_NATIVE_PACKAGER_HOSTNAME=${HOST_IP}
+      - EXPO_PUBLIC_API_URL=http://${HOST_IP}/api
+    volumes:
+      - ../LEXIMATE-MOBILE:/app
+      - /app/node_modules
+    stdin_open: true
+    tty: true
+    networks:
+      - leximate-network
+
   nginx:
     image: nginx:alpine
     container_name: leximate-nginx
