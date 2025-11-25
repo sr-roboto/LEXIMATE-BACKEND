@@ -37,6 +37,15 @@ export async function setupWebSocket(
       }
       userConnections.get(userId)?.add(socket);
 
+      // Broadcast user_online if this is their first connection
+      if (userConnections.get(userId)?.size === 1) {
+        broadcastToAll({
+          type: 'user_online',
+          userId,
+          timestamp: new Date().toISOString(),
+        });
+      }
+
       socket.send(
         JSON.stringify({
           type: 'connected',
@@ -68,6 +77,12 @@ export async function setupWebSocket(
           userConnections.get(userId)?.delete(socket);
           if (userConnections.get(userId)?.size === 0) {
             userConnections.delete(userId);
+            // Broadcast user_offline
+            broadcastToAll({
+              type: 'user_offline',
+              userId,
+              timestamp: new Date().toISOString(),
+            });
           }
         }
       });
@@ -76,10 +91,29 @@ export async function setupWebSocket(
         console.error('WebSocket error:', err);
         if (userConnections.has(userId)) {
           userConnections.get(userId)?.delete(socket);
+          if (userConnections.get(userId)?.size === 0) {
+            userConnections.delete(userId);
+            // Broadcast user_offline
+            broadcastToAll({
+              type: 'user_offline',
+              userId,
+              timestamp: new Date().toISOString(),
+            });
+          }
         }
       });
     }
   );
+
+  function broadcastToAll(message: any) {
+    userConnections.forEach((connections) => {
+      connections.forEach((client) => {
+        if (client.readyState === 1) {
+          client.send(JSON.stringify(message));
+        }
+      });
+    });
+  }
 
   chatEventEmitter.removeAllListeners('new_message');
   

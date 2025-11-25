@@ -22,7 +22,8 @@
       "@task/*": ["src/modules/task/*"],
       "@tool/*": ["src/modules/tool/*"],
       "@seed/*": ["src/modules/seed/*"],
-      "@chat/*": ["src/modules/chat/*"]
+      "@chat/*": ["src/modules/chat/*"],
+      "@notification/*": ["src/modules/notification/*"]
     }
   },
   "module": {

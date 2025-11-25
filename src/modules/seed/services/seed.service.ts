@@ -285,34 +285,68 @@ export class SeedService {
       }
 
       // 12. Notifications
-      const notificationsData = [
-        {
-          userId: student.id,
-          type: NotificationEnum.TASK_ASSIGNED,
-          title: 'Nueva tarea asignada',
-          message: 'Se ha asignado una nueva tarea: Tarea 1: Investigación',
-          data: { url: '/courses/course-id/task/task-id', taskId: 'task-id', courseId: 'course-id', courseName: 'Matemáticas Avanzadas' },
-        },
-        {
-          userId: teacher.id,
-          type: NotificationEnum.COMMENT_ADDED,
-          title: 'Nuevo comentario en tu post',
-          message: 'student comentó en tu post: "Bienvenida a Matemáticas Avanzadas"',
-          data: { url: '/courses/course-id/post/post-id', postId: 'post-id', courseId: 'course-id', commenterName: 'student' },
-        },
-        {
-          userId: student.id,
-          type: NotificationEnum.POST_CREATED,
-          title: 'Nuevo post en el curso',
-          message: 'teacher publicó: "Material de estudio - Historia Universal" en Historia Universal',
-          data: { url: '/courses/course-id/post/post-id', postId: 'post-id', courseId: 'course-id', courseName: 'Historia Universal' },
-          read: true,
-        },
-      ];
+      // 12. Notifications
+      // Fetch real entities to get IDs
+      const mathCourse = await this.courseRepository.findOne({ where: { name: 'Matemáticas Avanzadas' } });
+      const historyCourse = await this.courseRepository.findOne({ where: { name: 'Historia Universal' } });
+      
+      if (mathCourse && historyCourse) {
+        const mathTask = await this.taskRepository.findOne({ where: { course: { id: mathCourse.id }, title: 'Tarea 1: Investigación' } });
+        const mathPost = await this.postRepository.findOne({ where: { course: { id: mathCourse.id }, title: 'Bienvenida a Matemáticas Avanzadas' } });
+        const historyPost = await this.postRepository.findOne({ where: { course: { id: historyCourse.id }, title: 'Material de estudio - Historia Universal' } });
 
-      for (const notifData of notificationsData) {
-        const notification = this.notificationRepository.create(notifData);
-        await this.notificationRepository.save(notification);
+        const notificationsData = [];
+
+        if (mathTask) {
+          notificationsData.push({
+            userId: student.id,
+            type: NotificationEnum.TASK_ASSIGNED,
+            title: 'Nueva tarea asignada',
+            message: 'Se ha asignado una nueva tarea: Tarea 1: Investigación',
+            data: { 
+              url: `/courses/${mathCourse.id}/task/${mathTask.id}`, 
+              taskId: mathTask.id, 
+              courseId: mathCourse.id, 
+              courseName: mathCourse.name 
+            },
+          });
+        }
+
+        if (mathPost) {
+          notificationsData.push({
+            userId: teacher.id,
+            type: NotificationEnum.COMMENT_ADDED,
+            title: 'Nuevo comentario en tu post',
+            message: 'student comentó en tu post: "Bienvenida a Matemáticas Avanzadas"',
+            data: { 
+              url: `/courses/${mathCourse.id}/post/${mathPost.id}`, 
+              postId: mathPost.id, 
+              courseId: mathCourse.id, 
+              commenterName: 'student' 
+            },
+          });
+        }
+
+        if (historyPost) {
+          notificationsData.push({
+            userId: student.id,
+            type: NotificationEnum.POST_CREATED,
+            title: 'Nuevo post en el curso',
+            message: 'teacher publicó: "Material de estudio - Historia Universal" en Historia Universal',
+            data: { 
+              url: `/courses/${historyCourse.id}/post/${historyPost.id}`, 
+              postId: historyPost.id, 
+              courseId: historyCourse.id, 
+              courseName: historyCourse.name 
+            },
+            read: true,
+          });
+        }
+
+        for (const notifData of notificationsData) {
+          const notification = this.notificationRepository.create(notifData);
+          await this.notificationRepository.save(notification);
+        }
       }
     }
 

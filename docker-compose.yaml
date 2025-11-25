@@ -4,7 +4,7 @@ services:
   postgres:
     image: postgres:16-alpine
     restart: always
-    container_name: leximate_db
+    container_name: leximate-db
     ports:
       - '${DB_PORT}:5432'
     environment:

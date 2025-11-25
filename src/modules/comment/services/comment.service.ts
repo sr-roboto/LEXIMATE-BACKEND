@@ -96,7 +96,7 @@ export class CommentService {
     const [comments, total] = await this.commentRepository.findAndCount({
       where: { post: { id: existingPost.id } },
       relations: ['user', 'user.people', 'user.userFiles', 'post'],
-      order: { created_at: 'ASC' },
+      order: { created_at: 'DESC' },
       skip,
       take: limit,
     });
